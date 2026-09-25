@@ -1,0 +1,370 @@
+@import "tailwindcss";
+
+@theme {
+  --color-rus-black: #050505;
+  --color-rus-graphite: #0B0D10;
+  --color-rus-yellow: #FFC400;
+  --color-rus-red: #E51B23;
+  --color-rus-white: #F4F2EC;
+  --color-rus-grey: #A9AFB7;
+  --font-inter: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/*
+ * Global spacing system — content-driven, consistent section rhythm.
+ * --section-y-sm: compact bands (dividers, CTAs)
+ * --section-y-md: standard sections (default)
+ * --section-y-lg: flagship sections only (hero-adjacent storytelling)
+ * No min-h-screen / h-screen / arbitrary 100vh+ sections without a
+ * documented content reason.
+ */
+:root {
+  --section-y-sm: 3.5rem;
+  --section-y-md: 5rem;
+  --section-y-lg: 7rem;
+  --container-max: 80rem;
+  --gutter-mobile: 1.25rem;
+  --gutter-desktop: 3.5rem;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --section-y-sm: 4rem;
+    --section-y-md: 6rem;
+    --section-y-lg: 8rem;
+  }
+}
+
+.section-pad {
+  padding-top: var(--section-y-md);
+  padding-bottom: var(--section-y-md);
+}
+
+.section-pad-sm {
+  padding-top: var(--section-y-sm);
+  padding-bottom: var(--section-y-sm);
+}
+
+.section-pad-lg {
+  padding-top: var(--section-y-lg);
+  padding-bottom: var(--section-y-lg);
+}
+
+.container-rus {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--container-max);
+  padding-inline: var(--gutter-mobile);
+}
+
+@media (min-width: 1024px) {
+  .container-rus {
+    padding-inline: var(--gutter-desktop);
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+body {
+  font-family: var(--font-inter);
+  background-color: var(--color-rus-black);
+  color: var(--color-rus-white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-rus-graphite);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-rus-yellow);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #e6b000;
+}
+
+::selection {
+  background: rgba(255, 196, 0, 0.3);
+  color: var(--color-rus-white);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-rus-yellow);
+  outline-offset: 2px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+select,
+textarea {
+  @apply bg-rus-graphite border-rus-white/10 text-rus-white placeholder-rus-grey/50 transition-all duration-200;
+}
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+  @apply border-rus-yellow outline-none ring-1 ring-rus-yellow/20;
+}
+
+select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23A9AFB7' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5rem 1.5rem;
+  padding-right: 2.5rem;
+}
+
+/*
+ * The Current System — travelling current along circuit paths.
+ * Paths must carry pathLength={1}; the dash occupies ~5.5% of the path
+ * and loops seamlessly (dash 0.055 + gap 1.0 = 1.055 revolutions).
+ * The global prefers-reduced-motion rule above neutralises it.
+ */
+@keyframes current-travel {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -1.055; }
+}
+
+.current-line {
+  stroke-dasharray: 0.055 1;
+  animation: current-travel 3.4s linear infinite;
+}
+
+/* Horizontal rails: hide scrollbars while keeping scroll behavior */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Outlined display type for the trust statement */
+.text-outline-warm {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(244, 242, 236, 0.55);
+}
+
+/*
+ * ── Type system ─────────────────────────────────────────────────
+ * One set of typographic voices across every route:
+ *  .eyebrow      section-opening mono label (+ optional rule span)
+ *  .eyebrow-sm   in-content mono label (stats, plates, captions)
+ *  .display-2    section display heading (black, uppercase, tight)
+ *  .lead         section lead paragraph (generous measure)
+ *  .cap-mono     microcopy / captions / metadata
+ */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  color: var(--color-rus-grey);
+}
+
+.eyebrow-sm {
+  display: inline-block;
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: rgba(169, 175, 183, 0.7);
+}
+
+.display-2 {
+  font-weight: 900;
+  text-transform: uppercase;
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  color: var(--color-rus-white);
+  font-size: clamp(1.9rem, 2.2rem + 1.6vw, 3.75rem);
+}
+
+.lead {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--color-rus-grey);
+  max-width: 38rem;
+}
+
+.cap-mono {
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  color: rgba(169, 175, 183, 0.6);
+}
+
+/*
+ * ── Electrical motion language ──────────────────────────────────
+ * Restrained, engineered, signal-native. All keyframes are neutralised
+ * by the global prefers-reduced-motion rule above.
+ */
+
+/* One-shot: a trace draws itself (use with stroke-dasharray 1 + pathLength=1) */
+@keyframes trace-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Terminal point lights once when the trace reaches it */
+@keyframes terminal-on {
+  0% { opacity: 0; }
+  40% { opacity: 1; }
+  55% { opacity: 0.25; }
+  100% { opacity: 1; }
+}
+
+/* Yellow segment travels across an edge (CTA hover) — fast, circuit-like */
+@keyframes rail-travel {
+  from { transform: translateX(-110%); }
+  to { transform: translateX(430%); }
+}
+
+/* Single voltage flicker — two hard dips, then steady */
+@keyframes voltage-flicker {
+  0% { opacity: 1; }
+  12% { opacity: 0.35; }
+  24% { opacity: 1; }
+  40% { opacity: 0.5; }
+  55% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+/* Short electrical pulse for the phone icon on call CTAs */
+@keyframes contactor-pulse {
+  0%, 100% { transform: scale(1); }
+  30% { transform: scale(1.12); }
+  55% { transform: scale(0.96); }
+  75% { transform: scale(1); }
+}
+
+/* Energised trace rule — default state (pre-energise) is hidden via inline
+   style from the React component; these classes only run the draw. */
+.trace-draw {
+  stroke-dasharray: 1;
+  animation: trace-draw 0.5s linear forwards;
+}
+.terminal-blink {
+  animation: terminal-on 0.4s ease-out forwards;
+}
+
+/*
+ * Plate CTA — electrical hover. A yellow rail segment crosses the bottom
+ * edge; a terminal indicator activates. No scale(), no glow halos.
+ */
+.plate-cta {
+  position: relative;
+}
+.plate-cta .plate-rail {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 24%;
+  height: 2px;
+  background: var(--color-rus-yellow);
+  transform: translateX(-110%);
+  pointer-events: none;
+}
+.plate-cta .plate-terminal {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  width: 4px;
+  height: 4px;
+  background: var(--color-rus-yellow);
+  opacity: 0;
+  transition: opacity 0.18s ease-out;
+  pointer-events: none;
+}
+@media (hover: hover) {
+  .plate-cta:hover .plate-rail {
+    animation: rail-travel 0.32s linear forwards;
+  }
+  .plate-cta:hover .plate-terminal {
+    opacity: 1;
+  }
+  .plate-cta:hover .lucide-arrow-right {
+    transform: translateX(4px);
+  }
+  .call-cta:hover .contactor-icon {
+    animation: contactor-pulse 0.4s ease-out;
+  }
+}
+.plate-cta .lucide-arrow-right {
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+/* On a yellow plate, the travelling rail reads darker instead */
+.plate-cta-primary .plate-rail,
+.plate-cta-primary .plate-terminal {
+  background: var(--color-rus-black);
+}
+.plate-cta-primary .plate-terminal {
+  right: 14px; /* clear of the sheared notch */
+}
+
+/* Flicker helper: applied once with an inline delay (e.g. hero voltage) */
+.flicker-once {
+  animation: voltage-flicker 0.22s steps(1, end) 1 forwards;
+}
+
+/* Mobile swipe rail — snap to cards, hide scrollbar (design-system .no-scrollbar) */
+.rail-snap {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.rail-snap > * {
+  scroll-snap-align: start;
+}
+
+/* Safe-area for the fixed mobile action bar */
+.safe-pad-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,196,0,0.1), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.2; }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 4s ease-in-out infinite;
+}
