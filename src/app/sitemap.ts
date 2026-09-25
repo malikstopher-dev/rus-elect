@@ -3,6 +3,8 @@ import { services } from "@/data/services";
 
 const BASE_URL = "https://ruselectrical.co.za";
 
+export const dynamic = "force-static";
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const servicePages = services.map((service) => ({
     url: `${BASE_URL}/services/${service.slug}`,
