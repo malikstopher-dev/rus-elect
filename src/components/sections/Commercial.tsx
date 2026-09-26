@@ -98,7 +98,7 @@ export default function Commercial() {
           02 — Commercial + Industrial
         </motion.p>
         <motion.p
-          className="absolute right-5 top-6 font-mono text-[10px] uppercase tracking-[0.3em] text-rus-white/60 lg:right-14 lg:top-10"
+          className="absolute right-5 top-6 hidden font-mono text-[10px] uppercase tracking-[0.3em] text-rus-white/60 sm:block lg:right-14 lg:top-10"
           initial={reduced ? { opacity: 1 } : { opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -175,7 +175,7 @@ export default function Commercial() {
         </motion.div>
       </div>
 
-      <div className="section-pad-sm" aria-hidden="true" />
+      <div className="py-8 lg:py-16" aria-hidden="true" />
     </section>
   );
 }

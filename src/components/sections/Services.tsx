@@ -8,6 +8,7 @@ import { ArrowRight, Plus } from "lucide-react";
 import { services, serviceImages, serviceApplications } from "@/data/services";
 import { BoltMark, CurrentLine } from "@/components/ui/BoltMark";
 import { TraceRule } from "@/components/ui/Trace";
+import { PlateReveal, SectionTrace } from "@/components/ui/Conductor";
 import { useReducedMotion, easings } from "@/lib/motion";
 
 /**
@@ -49,7 +50,6 @@ function StageVisual({ slug, number }: { slug: string; number: string }) {
       </svg>
       <BoltMark className="absolute left-10 top-10 h-20 w-auto text-rus-yellow opacity-[0.12]" />
       {/* Technical annotations */}
-      <span className="cap-mono absolute left-10 top-10 ml-24 mt-6">Site visual — pending commission</span>
       <span className="cap-mono absolute bottom-32 right-8">REF RUS·{number}</span>
     </div>
   );
@@ -62,6 +62,14 @@ export default function Services() {
 
   return (
     <section className="relative bg-rus-black section-pad overflow-hidden">
+      <SectionTrace />
+      {/* Schematic corner frame — sparse technical mark */}
+      <div className="pointer-events-none absolute inset-4 lg:inset-6" aria-hidden="true">
+        <span className="absolute left-0 top-0 h-4 w-4 border-l border-t border-rus-white/[0.07]" />
+        <span className="absolute right-0 top-0 h-4 w-4 border-r border-t border-rus-white/[0.07]" />
+        <span className="absolute bottom-0 left-0 h-4 w-4 border-b border-l border-rus-white/[0.07]" />
+        <span className="absolute bottom-0 right-0 h-4 w-4 border-b border-r border-rus-white/[0.07]" />
+      </div>
       <div className="container-rus">
         {/* ── Section header ─────────────────────────────────────── */}
         <motion.div
@@ -163,12 +171,15 @@ export default function Services() {
                   <motion.div
                     key={activeService.slug}
                     className="absolute inset-0"
-                    initial={reduced ? { opacity: 1 } : { opacity: 0, clipPath: "inset(0 100% 0 0)" }}
-                    animate={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
+                    initial={reduced ? { opacity: 1 } : { opacity: 1 }}
+                    animate={{ opacity: 1 }}
                     exit={reduced ? { opacity: 0 } : { opacity: 0 }}
-                    transition={{ duration: reduced ? 0 : 0.3, ease: easings.smooth }}
+                    transition={{ duration: reduced ? 0 : 0.15, ease: easings.smooth }}
                   >
-                    <StageVisual slug={activeService.slug} number={activeService.number} />
+                    {/* Contactor-style plate reveal on every service switch */}
+                    <PlateReveal reduced={reduced} plateClassName="bg-rus-graphite" key={`plates-${activeService.slug}`}>
+                      <StageVisual slug={activeService.slug} number={activeService.number} />
+                    </PlateReveal>
                   </motion.div>
                 </AnimatePresence>
 
@@ -242,35 +253,50 @@ export default function Services() {
             return (
               <div
                 key={service.id}
-                className="border-t border-rus-white/10 last:border-b"
+                className="relative border-t border-rus-white/10 last:border-b"
               >
+                {/* Current sweeps the row edge the moment the switch closes */}
+                {active && !reduced && (
+                  <span
+                    className="pointer-events-none absolute inset-x-0 top-0 h-px overflow-hidden"
+                    aria-hidden="true"
+                  >
+                    <motion.span
+                      key={`sweep-${service.id}`}
+                      className="absolute top-0 h-[2px] w-10 bg-rus-yellow"
+                      initial={{ left: "-4%" }}
+                      animate={{ left: "94%" }}
+                      transition={{ duration: 0.28, ease: "linear" }}
+                    />
+                  </span>
+                )}
                 <button
                   onClick={() => setActiveIndex(active ? -1 : index)}
                   className="flex w-full items-baseline gap-4 py-5 text-left"
                   aria-expanded={active}
                 >
                   <span
-                    className={`font-mono text-xs font-bold ${
+                    className={`font-mono text-xs font-bold transition-colors duration-200 ${
                       active ? "text-rus-yellow" : "text-rus-grey/50"
                     }`}
                   >
                     {service.number}
                   </span>
                   <span
-                    className={`flex-1 text-lg font-bold uppercase leading-tight tracking-tight ${
+                    className={`flex-1 text-lg font-bold uppercase leading-tight tracking-tight transition-colors duration-200 ${
                       active ? "text-rus-white" : "text-rus-grey"
                     }`}
                   >
                     {service.title}
                   </span>
                   <span
-                    className={`flex h-11 w-11 shrink-0 items-center justify-center ${
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center transition-colors duration-200 ${
                       active ? "text-rus-yellow" : "text-rus-grey/50"
                     }`}
                     aria-hidden="true"
                   >
                     <Plus
-                      className={`h-5 w-5 transition-transform duration-300 ${
+                      className={`h-5 w-5 transition-transform duration-200 ${
                         active ? "rotate-45" : ""
                       }`}
                     />
@@ -282,20 +308,34 @@ export default function Services() {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: reduced ? 0 : 0.3, ease: easings.smooth }}
+                      transition={{
+                        duration: reduced ? 0 : 0.24,
+                        ease: easings.snappy,
+                      }}
                       className="overflow-hidden"
                     >
-                      <div className="pb-7">
+                      <motion.div
+                        initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          duration: reduced ? 0 : 0.22,
+                          delay: reduced ? 0 : 0.1,
+                          ease: easings.smooth,
+                        }}
+                        className="pb-7"
+                      >
                         {serviceImages[service.slug] ? (
                           <div className="relative mb-5 aspect-[16/10] overflow-hidden">
-                            <Image
-                              src={serviceImages[service.slug] as string}
-                              alt={`${service.title} — RUS Electrical`}
-                              fill
-                              className="object-cover object-center"
-                              sizes="100vw"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-rus-black/60 to-transparent" />
+                            <PlateReveal reduced={reduced}>
+                              <Image
+                                src={serviceImages[service.slug] as string}
+                                alt={`${service.title} — RUS Electrical`}
+                                fill
+                                className="object-cover object-center"
+                                sizes="100vw"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-rus-black/60 to-transparent" />
+                            </PlateReveal>
                           </div>
                         ) : (
                           <div className="relative mb-5 flex h-28 items-end justify-between overflow-hidden bg-rus-graphite p-4">
@@ -312,17 +352,30 @@ export default function Services() {
                         <p className="mb-5 text-sm leading-relaxed text-rus-grey">
                           {service.description}
                         </p>
+                        {/* Technical tags energise in sequence */}
                         <ul className="mb-6 flex flex-wrap gap-x-5 gap-y-2">
                           {(serviceApplications[service.slug] || [])
                             .slice(0, 3)
-                            .map((item) => (
-                              <li
+                            .map((item, tagIndex) => (
+                              <motion.li
                                 key={item}
+                                initial={
+                                  reduced ? { opacity: 1, x: 0 } : { opacity: 0, x: -6 }
+                                }
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{
+                                  duration: reduced ? 0 : 0.2,
+                                  delay: reduced ? 0 : 0.16 + tagIndex * 0.05,
+                                  ease: easings.smooth,
+                                }}
                                 className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-rus-white/80"
                               >
-                                <span className="h-1 w-1 bg-rus-yellow" aria-hidden="true" />
+                                <span
+                                  className="h-1 w-1 bg-rus-yellow"
+                                  aria-hidden="true"
+                                />
                                 {item}
-                              </li>
+                              </motion.li>
                             ))}
                         </ul>
                         <Link
@@ -338,7 +391,7 @@ export default function Services() {
                           <span className="plate-rail" aria-hidden="true" />
                           <span className="plate-terminal" aria-hidden="true" />
                         </Link>
-                      </div>
+                      </motion.div>
                     </motion.div>
                   )}
                 </AnimatePresence>

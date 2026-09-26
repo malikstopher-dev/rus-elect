@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Check, AlertTriangle } from "lucide-react";
 import { BackgroundSystem } from "@/components/ui/BackgroundSystem";
+import { SectionTrace } from "@/components/ui/Conductor";
 import { useReducedMotion, fadeInUp, easings } from "@/lib/motion";
 
 const items = [
@@ -25,6 +26,7 @@ export default function Compliance() {
 
   return (
     <section className="relative bg-rus-graphite section-pad overflow-hidden">
+      <SectionTrace />
       <BackgroundSystem variant="lines" intensity="subtle" />
 
       <div className="container-rus">

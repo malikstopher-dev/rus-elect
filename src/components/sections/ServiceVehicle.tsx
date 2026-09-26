@@ -75,7 +75,7 @@ export default function ServiceVehicle() {
             </p>
             <a
               href={business.primaryPhoneLink}
-              className="mt-6 inline-flex items-center gap-3 font-mono text-sm tracking-wider text-rus-white transition-colors hover:text-rus-yellow"
+              className="mt-6 inline-flex min-h-[44px] items-center gap-3 py-3 font-mono text-sm tracking-wider text-rus-white transition-colors hover:text-rus-yellow"
             >
               <Phone className="h-4 w-4 text-rus-yellow" aria-hidden="true" />
               {business.primaryPhone}

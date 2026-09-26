@@ -10,7 +10,7 @@ export default function ContactCTA() {
   const reduced = useReducedMotion();
 
   return (
-    <section className="relative bg-rus-graphite section-pad overflow-hidden">
+    <section id="contact-cta" className="relative bg-rus-graphite section-pad overflow-hidden">
       <BackgroundSystem variant="radial" intensity="subtle" />
       {/* Schematic corner frame */}
       <div className="pointer-events-none absolute inset-4 lg:inset-6" aria-hidden="true">

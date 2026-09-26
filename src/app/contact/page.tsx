@@ -22,7 +22,7 @@ export default function ContactPage() {
             done properly<span className="text-rus-yellow">.</span>
           </>
         }
-        support="Give us a call or fill in the form — we'll get back to you. Verified contact line below; secondary details pending owner confirmation."
+        support="Give us a call or send your details through the form and we'll get back to you to discuss the work."
       />
 
       <section className="bg-rus-black section-pad">
@@ -70,14 +70,6 @@ export default function ContactPage() {
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Pending-confirmation note */}
-            <div className="mt-8 border border-rus-white/10 border-l-2 border-l-rus-yellow bg-rus-graphite p-5">
-              <p className="text-sm leading-relaxed text-rus-grey">
-                Secondary phone and email details are awaiting confirmation from
-                the business owner. Please use the primary phone number above.
-              </p>
             </div>
           </div>
 

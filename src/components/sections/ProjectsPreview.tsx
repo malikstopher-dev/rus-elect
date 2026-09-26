@@ -6,6 +6,7 @@ import { projects } from "@/data/projects";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { BackgroundSystem } from "@/components/ui/BackgroundSystem";
+import { SectionTrace } from "@/components/ui/Conductor";
 import { useReducedMotion, fadeInUp, easings } from "@/lib/motion";
 
 export default function ProjectsPreview() {
@@ -14,6 +15,7 @@ export default function ProjectsPreview() {
 
   return (
     <section className="relative bg-rus-black section-pad overflow-hidden">
+      <SectionTrace />
       <BackgroundSystem variant="dots" intensity="subtle" />
       {/* Schematic corner frame — very low-key technical detail */}
       <div className="pointer-events-none absolute inset-4 lg:inset-6" aria-hidden="true">
@@ -50,9 +52,9 @@ export default function ProjectsPreview() {
         {/* Desktop/tablet: grid. Mobile: snap-scrolling capability rail */}
         <motion.div
           className="rail-snap -mx-5 flex gap-4 overflow-x-auto px-5 pb-3 sm:gap-5 md:mx-0 md:grid md:grid-cols-[1fr_1fr] md:gap-6 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-3 lg:gap-8"
-          initial={reduced ? {} : { opacity: 0 }}
-          animate={reduced ? {} : { opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: easings.smooth }}
+          initial={reduced ? { opacity: 1 } : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: reduced ? 0 : 0.8, delay: reduced ? 0 : 0.2, ease: easings.smooth }}
         >
           {featuredProjects.map((project, index) => (
             <motion.article
@@ -61,7 +63,7 @@ export default function ProjectsPreview() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15 + index * 0.1, ease: easings.smooth }}
               whileHover={{ y: -4 }}
-              className="group relative w-[80vw] max-w-[330px] shrink-0 snap-center bg-rus-graphite border border-rus-white/5 overflow-hidden transition-all duration-500 hover:border-rus-yellow/20 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.4)] md:w-auto md:max-w-none md:shrink md:snap-align-none"
+              className="group relative w-[85vw] max-w-[360px] shrink-0 snap-center bg-rus-graphite border border-rus-white/5 overflow-hidden transition-all duration-500 hover:border-rus-yellow/20 hover:shadow-[0_20px_40px_-20px_rgba(0,0,0,0.4)] md:w-auto md:max-w-none md:shrink md:snap-align-none"
             >
               <div className="relative aspect-[4/3] overflow-hidden">
                 {project.image ? (
@@ -79,8 +81,9 @@ export default function ProjectsPreview() {
                     </span>
                   </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-rus-black/70 via-transparent to-transparent" />
-                <div className="absolute inset-0" style={{
+                {/* Scrim only where desktop overlays text — mobile keeps the plate clean */}
+                <div className="hidden md:block absolute inset-0 bg-gradient-to-t from-rus-black/70 via-transparent to-transparent" />
+                <div className="hidden md:block absolute inset-0" style={{
                   backgroundImage: `
                     radial-gradient(
                       ellipse at bottom,
@@ -91,7 +94,9 @@ export default function ProjectsPreview() {
                 }} />
               </div>
 
-              <div className="absolute bottom-0 left-0 right-0 p-6">
+              {/* Editorial meta block — in-flow below the image on mobile,
+                  overlaid on the image from tablet up */}
+              <div className="relative border-t border-rus-white/10 p-5 md:absolute md:bottom-0 md:left-0 md:right-0 md:border-t-0 md:p-6">
                 <div className="flex items-center justify-between mb-3">
                   <motion.span
                     initial={{ opacity: 0, x: -10 }}
@@ -141,9 +146,9 @@ export default function ProjectsPreview() {
         </motion.div>
 
         <motion.div
-          initial={reduced ? {} : { opacity: 0, y: 20 }}
-          animate={reduced ? {} : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
+          initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: reduced ? 0 : 0.6, delay: reduced ? 0 : 0.8 }}
           className="mt-12 text-center md:hidden"
         >
 <Button variant="outline" size="md" href="/projects" icon="arrow">

@@ -63,6 +63,43 @@
   }
 }
 
+/*
+ * Mobile section rhythm (<1024px only — desktop spacing is unchanged).
+ *
+ * 1. Cascade repair: these plain-CSS padding rules out-specify Tailwind
+ *    utilities, so authored `section-pad pt-0` flush joins were silently
+ *    rendering a full extra section of top padding.
+ * 2. Single-sided transitions: when two padded sections meet, the first
+ *    section's bottom pad already provides the intentional 64–96px
+ *    breathing gap, so the second section starts flush instead of
+ *    stacking two full pads (previously 160–240px of empty black).
+ */
+@media (max-width: 1023.98px) {
+  .section-pad.pt-0,
+  .section-pad-sm.pt-0,
+  .section-pad-lg.pt-0 {
+    padding-top: 0;
+  }
+
+  main > section + section[class*="section-pad"] {
+    padding-top: 0;
+  }
+
+  main > section + section > .container-rus[class*="section-pad"] {
+    padding-top: 0;
+  }
+
+  /*
+   * 3. Nested sections: QuoteForm renders its own section-pad inside the
+   *    contact page's section — zero it so the wrapper grid's gap-14 is
+   *    the only rhythm (mobile only; desktop baseline unchanged).
+   */
+  #quote > section.section-pad {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
 html {
   scroll-behavior: smooth;
 }

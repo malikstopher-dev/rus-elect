@@ -8,6 +8,27 @@ import { Button } from "@/components/ui/Button";
 import { BackgroundSystem } from "@/components/ui/BackgroundSystem";
 import { useReducedMotion, fadeInUp, easings } from "@/lib/motion";
 
+/**
+ * Focus conductor — a short current segment races the top edge of the
+ * control the moment focus lands, then rests as the static yellow border.
+ */
+function FocusSweep({ active, reduced }: { active: boolean; reduced: boolean }) {
+  if (!active || reduced) return null;
+  return (
+    <span
+      className="pointer-events-none absolute inset-x-0 top-0 z-10 overflow-hidden"
+      aria-hidden="true"
+    >
+      <motion.span
+        className="absolute top-0 h-[2px] w-16 bg-rus-yellow"
+        initial={{ left: "-30%" }}
+        animate={{ left: "90%" }}
+        transition={{ duration: 0.32, ease: easings.smooth }}
+      />
+    </span>
+  );
+}
+
 export default function QuoteForm() {
   const [submitted, setSubmitted] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -26,7 +47,7 @@ export default function QuoteForm() {
   ];
 
   return (
-    <section className="relative bg-rus-black section-pad overflow-hidden" id="quote">
+    <section className="relative bg-rus-black section-pad overflow-hidden">
       <BackgroundSystem variant="diagonal" intensity="subtle" />
 
       <div className="container-rus">
@@ -46,45 +67,77 @@ export default function QuoteForm() {
           {submitted ? (
             <motion.div
               key="success"
-              initial={reduced ? {} : { opacity: 0, scale: 0.95, y: 20 }}
-              animate={reduced ? {} : { opacity: 1, scale: 1, y: 0 }}
-              exit={reduced ? {} : { opacity: 0, scale: 0.95, y: -20 }}
+              initial={reduced ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={reduced ? { opacity: 0, scale: 0.95, y: -20 } : { opacity: 0, scale: 0.95, y: -20 }}
               transition={{ duration: reduced ? 0 : 0.5, ease: easings.gentle }}
               className="max-w-xl mx-auto text-center"
             >
               <motion.div
-                initial={{ opacity: 0, scale: 0.5 }}
+                initial={reduced ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.6 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.1, ease: easings.gentle }}
-                className="w-20 h-20 bg-rus-yellow mx-auto mb-8 flex items-center justify-center rounded-none"
+                transition={
+                  reduced
+                    ? { duration: 0 }
+                    : { duration: 0.26, delay: 0.05, ease: easings.snappy }
+                }
+                className="w-20 h-20 bg-rus-yellow mx-auto mb-5 flex items-center justify-center rounded-none"
               >
                 <Check className="w-10 h-10 text-rus-black" />
               </motion.div>
+              {/* Circuit latches closed — conductor draws into a lit terminal */}
+              <div className="mx-auto mb-7 flex items-center justify-center gap-2" aria-hidden="true">
+                <motion.span
+                  className="h-px w-28 origin-left bg-rus-yellow/70"
+                  initial={reduced ? { scaleX: 1 } : { scaleX: 0 }}
+                  animate={{ scaleX: 1 }}
+                  transition={
+                    reduced
+                      ? { duration: 0 }
+                      : { duration: 0.45, delay: 0.2, ease: easings.smooth }
+                  }
+                />
+                <motion.span
+                  className="h-1.5 w-1.5 bg-rus-yellow"
+                  initial={reduced ? { opacity: 1 } : { opacity: 0.15 }}
+                  animate={{ opacity: 1 }}
+                  transition={
+                    reduced
+                      ? { duration: 0 }
+                      : { duration: 0.18, delay: 0.6, ease: easings.snappy }
+                  }
+                />
+              </div>
               <motion.h3
-                initial={{ opacity: 0, y: 10 }}
+                initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.2 }}
+                transition={{ duration: reduced ? 0 : 0.4, delay: reduced ? 0 : 0.3 }}
                 className="text-rus-white text-2xl lg:text-3xl font-bold mb-4"
               >
                 Thank you
               </motion.h3>
               <motion.p
-                initial={{ opacity: 0, y: 10 }}
+                initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.3 }}
+                transition={{ duration: reduced ? 0 : 0.4, delay: reduced ? 0 : 0.4 }}
                 className="text-rus-grey text-lg"
               >
                 Your quote request has been received. We will be in touch shortly.
               </motion.p>
               <motion.button
-                initial={{ opacity: 0, y: 10 }}
+                initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.4 }}
+                transition={{ duration: reduced ? 0 : 0.4, delay: reduced ? 0 : 0.5 }}
                 onClick={() => setSubmitted(false)}
-                className="mt-8 text-rus-yellow font-semibold text-sm hover:underline flex items-center justify-center gap-2 mx-auto"
+                className="mt-8 inline-flex min-h-[44px] items-center gap-2 text-rus-yellow font-semibold text-sm hover:underline mx-auto"
               >
                 Submit another request
-                <motion.span animate={{ x: [0, 4, 0] }} transition={{ duration: 1, repeat: Infinity }}>
+                <motion.span
+                  animate={reduced ? {} : { x: [0, 4, 0] }}
+                  transition={
+                    reduced ? { duration: 0 } : { duration: 1, repeat: Infinity }
+                  }
+                >
                   →
                 </motion.span>
               </motion.button>
@@ -93,9 +146,9 @@ export default function QuoteForm() {
             <motion.form
               key="form"
               onSubmit={handleSubmit}
-              initial={reduced ? {} : { opacity: 0, y: 20 }}
-              animate={reduced ? {} : { opacity: 1, y: 0 }}
-              exit={reduced ? {} : { opacity: 0, y: -20 }}
+              initial={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduced ? { opacity: 0, y: -20 } : { opacity: 0, y: -20 }}
               transition={{ duration: reduced ? 0 : 0.4, ease: easings.smooth }}
               className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-12 lg:gap-16"
             >
@@ -156,7 +209,7 @@ export default function QuoteForm() {
                   <Phone className="w-5 h-5 text-rus-yellow" />
                   <div>
                     <p className="text-rus-grey/70 text-xs">Prefer to call?</p>
-                    <a href="tel:+27721326098" className="text-rus-white font-semibold hover:text-rus-yellow transition-colors">
+                    <a href="tel:+27721326098" className="inline-flex min-h-[44px] items-center text-rus-white font-semibold hover:text-rus-yellow transition-colors">
                       072 132 6098
                     </a>
                   </div>
@@ -198,6 +251,7 @@ export default function QuoteForm() {
                         {field.label}
                       </label>
                       <div className="relative">
+                        <FocusSweep active={focusedField === field.id} reduced={reduced} />
                         {field.icon && (
                           <motion.div
                             className="absolute left-4 top-1/2 -translate-y-1/2 text-rus-grey/50 transition-colors duration-200"
@@ -234,6 +288,7 @@ export default function QuoteForm() {
                       Property Type
                     </label>
                     <div className="relative">
+                      <FocusSweep active={focusedField === "propertyType"} reduced={reduced} />
                       <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-rus-grey/50" aria-hidden="true" />
                       <select
                         id="propertyType"
@@ -266,6 +321,7 @@ export default function QuoteForm() {
                       Service Required
                     </label>
                     <div className="relative">
+                      <FocusSweep active={focusedField === "service"} reduced={reduced} />
                       <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-rus-grey/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                       </svg>
@@ -302,6 +358,7 @@ export default function QuoteForm() {
                         Urgency
                       </label>
                       <div className="relative">
+                        <FocusSweep active={focusedField === "urgency"} reduced={reduced} />
                         <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-rus-grey/50" aria-hidden="true" />
                         <select
                           id="urgency"
@@ -331,7 +388,9 @@ export default function QuoteForm() {
                   <label htmlFor="description" className="block text-rus-grey text-sm mb-2">
                     Description *
                   </label>
-                  <textarea
+                  <div className="relative">
+                    <FocusSweep active={focusedField === "description"} reduced={reduced} />
+                    <textarea
                     id="description"
                     name="description"
                     required
@@ -341,6 +400,7 @@ export default function QuoteForm() {
                     onFocus={() => setFocusedField("description")}
                     onBlur={() => setFocusedField(null)}
                   />
+                  </div>
                 </motion.div>
 
                 <motion.div

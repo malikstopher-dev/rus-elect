@@ -85,7 +85,7 @@ export default function ServicesPage() {
           </ol>
 
           <p className="mt-8 font-mono text-[10px] uppercase tracking-[0.28em] text-rus-grey/60">
-            Full descriptions on each service page · Verified scope only
+            Full descriptions on each service page
           </p>
         </div>
       </section>

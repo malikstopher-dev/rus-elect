@@ -55,11 +55,11 @@ function FooterNav({ title, links }: { title: string; links: Array<[string, stri
 export default function Footer() {
   return (
     <footer className="relative overflow-hidden border-t border-rus-white/10 bg-rus-black">
-      <div className="container-rus py-12 lg:py-16">
+      <div className="container-rus pt-6 pb-12 lg:pt-16 lg:pb-16">
         <div className="grid grid-cols-1 gap-10 sm:gap-12 lg:grid-cols-[1.5fr_1fr_1fr_1.2fr] lg:gap-12">
           {/* Brand */}
           <div className="order-1 lg:order-none lg:pr-8">
-            <Link href="/" aria-label="RUS Electrical home" className="inline-flex">
+            <Link href="/" aria-label="RUS Electrical home" className="inline-flex py-1">
               <RusWordmark showTagline />
             </Link>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-rus-grey lg:mt-6 lg:text-base">

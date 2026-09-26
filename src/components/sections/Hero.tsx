@@ -1,8 +1,9 @@
 "use client";
 
+import { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Phone, ArrowRight } from "lucide-react";
 import { BoltMark } from "@/components/ui/BoltMark";
 import { useReducedMotion, easings } from "@/lib/motion";
@@ -32,6 +33,18 @@ const PLATE_CLIP =
  */
 export default function Hero() {
   const reduced = useReducedMotion();
+
+  /** Mobile poster parallax — a few pixels only, transform-driven. */
+  const posterRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: posterProgress } = useScroll({
+    target: posterRef,
+    offset: ["start end", "end start"],
+  });
+  const posterY = useTransform(
+    posterProgress,
+    [0, 1],
+    reduced ? [0, 0] : [14, -14]
+  );
 
   const t = (delay: number, duration = 0.5) => ({
     duration: reduced ? 0 : duration,
@@ -108,7 +121,7 @@ export default function Hero() {
             className="absolute inset-0"
             initial={reduced ? { clipPath: "inset(0 0 0 0)" } : { clipPath: "inset(0 0 0 100%)" }}
             animate={{ clipPath: "inset(0 0 0 0)" }}
-            transition={t(0.55, 0.55)}
+            transition={t(0.8, 0.55)}
           >
             <Image
               src="/assets/hero-residential-electrician.webp"
@@ -140,7 +153,7 @@ export default function Hero() {
               pathLength={1}
               initial={reduced ? { pathLength: 1, strokeOpacity: 0.55 } : { pathLength: 0, strokeOpacity: 0.55 }}
               animate={{ pathLength: 1 }}
-              transition={t(0.85, 0.3)}
+              transition={t(1.15, 0.3)}
             />
           </svg>
 
@@ -148,7 +161,7 @@ export default function Hero() {
             className="absolute bottom-6 left-24 font-mono text-[10px] uppercase tracking-[0.3em] text-rus-white/70"
             initial={reduced ? { opacity: 1 } : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={t(1.15, 0.3)}
+            transition={t(1.4, 0.3)}
           >
             RUS technician · on site
           </motion.p>
@@ -159,11 +172,12 @@ export default function Hero() {
       <div className="container-rus relative flex flex-col lg:min-h-[calc(100svh-4rem)]">
         <div className="relative z-10 pb-8 pt-9 lg:flex lg:flex-1 lg:items-center lg:py-0">
           <div className="w-full max-w-3xl">
-            {/* Stage 2b — micro location line rides the first trace */}
+            {/* Stage 2b — micro location line rides the first trace.
+                Spec: trace travels @0.10s, label activates @0.25s */}
             <motion.p
               initial={reduced ? { opacity: 1 } : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={t(0.1, 0.35)}
+              transition={t(0.25, 0.35)}
               className="mb-5 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.32em] text-rus-grey lg:mb-7 lg:text-[11px]"
             >
               <motion.span
@@ -176,7 +190,7 @@ export default function Hero() {
               Sandton / Johannesburg North
             </motion.p>
 
-            {/* Stage 3 — masked line reveal, flicker, terminal dot last */}
+            {/* Stage 3 — masked line reveal @0.35/0.45/0.55, terminal dot @0.70 */}
             <motion.h1
               initial={reduced ? { opacity: 1 } : { opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -184,26 +198,27 @@ export default function Hero() {
               className="text-[clamp(2.55rem,12.4vw,6.75rem)] font-black uppercase leading-[0.92] tracking-[-0.015em] text-rus-white lg:text-[clamp(3.05rem,7.4vw,6.75rem)]"
             >
               <span className="block overflow-hidden">
-                <motion.span className="block" {...line(0.32)}>Power</motion.span>
+                <motion.span className="block" {...line(0.35)}>Power</motion.span>
               </span>
               <span className="block overflow-hidden">
-                <motion.span className="block" {...line(0.42)}>without</motion.span>
+                <motion.span className="block" {...line(0.45)}>without</motion.span>
               </span>
               <span className="block overflow-hidden">
-                <motion.span className="block" {...line(0.52)}>
+                <motion.span className="block whitespace-nowrap" {...line(0.55)}>
                   <motion.span
                     initial={reduced ? {} : { opacity: 1 }}
                     animate={reduced ? {} : { opacity: [1, 0.35, 1, 0.5, 1] }}
-                    transition={reduced ? {} : { duration: 0.22, delay: 0.95, times: [0, 0.25, 0.5, 0.75, 1] }}
+                    transition={reduced ? {} : { duration: 0.22, delay: 0.6, times: [0, 0.25, 0.5, 0.75, 1] }}
                     className="inline-block"
                   >
                     compromise
                   </motion.span>
+                  {/* Terminal point — switches on @0.70s */}
                   <motion.span
                     className="text-rus-yellow"
                     initial={reduced ? { opacity: 1 } : { opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={t(1.12, 0.15)}
+                    animate={reduced ? { opacity: 1 } : { opacity: [0, 1, 0.3, 1] }}
+                    transition={reduced ? { duration: 0 } : { duration: 0.3, delay: 0.7, times: [0, 0.35, 0.6, 1] }}
                   >
                     .
                   </motion.span>
@@ -211,10 +226,11 @@ export default function Hero() {
               </span>
             </motion.h1>
 
+            {/* Supporting copy @0.85s */}
             <motion.p
               initial={reduced ? { opacity: 1 } : { opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={t(0.72, 0.4)}
+              transition={t(0.85, 0.4)}
               className="mt-6 max-w-md text-base leading-relaxed text-rus-grey lg:mt-8 lg:text-lg"
             >
               Electrical systems for homes, businesses and demanding
@@ -224,18 +240,18 @@ export default function Hero() {
             <motion.p
               initial={reduced ? { opacity: 1 } : { opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={t(0.8, 0.4)}
+              transition={t(0.92, 0.4)}
               className="mt-5 hidden items-center gap-3 text-sm text-rus-grey/90 sm:flex"
             >
               <BoltMark className="h-3.5 w-auto text-rus-yellow" aria-hidden="true" />
               <span>&ldquo;{business.tagline}&rdquo;</span>
             </motion.p>
 
-            {/* Stage 5 — CTA rail activates */}
+            {/* Stage 5 — CTA energises @1.00s */}
             <motion.div
               initial={reduced ? { opacity: 1 } : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={t(0.95, 0.4)}
+              transition={t(1.0, 0.4)}
               className="mt-7 flex flex-col gap-4 sm:flex-row sm:items-center lg:mt-10"
             >
               <Link
@@ -264,27 +280,80 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* ── Mobile poster image — begins immediately after the fold ── */}
+        {/* ── Mobile poster image — diagonal electrical-panel wipe @1.10s ── */}
         <motion.div
+          ref={posterRef}
           className="relative z-10 -mx-5 mb-8 aspect-[4/5] max-h-[58svh] overflow-hidden lg:hidden"
           style={{ clipPath: "polygon(0 4%, 100% 0, 100% 100%, 0 100%)" }}
-          initial={reduced ? { clipPath: "polygon(0 4%, 100% 0, 100% 4%, 0 8%)", opacity: 1 } : { clipPath: "polygon(0 4%, 100% 0, 100% 0, 0 4%)" }}
+          initial={reduced ? { clipPath: "polygon(0 4%, 100% 0, 100% 100%, 0 100%)", opacity: 1 } : { clipPath: "polygon(0 4%, 100% 0, 100% 0, 0 4%)" }}
           animate={{ clipPath: "polygon(0 4%, 100% 0, 100% 100%, 0 100%)" }}
-          transition={t(0.6, 0.5)}
+          transition={t(1.1, 0.5)}
         >
-          <Image
-            src="/assets/hero-residential-electrician.webp"
-            alt="RUS Electrical technician working at a distribution board"
-            fill
-            priority
-            className="object-cover object-[center_28%]"
-            sizes="100vw"
-          />
+          {/* Parallax: image drifts a few pixels only — transform, never layout */}
+          <motion.div
+            className="absolute inset-0"
+            style={{ y: posterY }}
+            aria-hidden="true"
+          >
+            <Image
+              src="/assets/hero-residential-electrician.webp"
+              alt="RUS Electrical technician working at a distribution board"
+              fill
+              priority
+              className="object-cover object-[center_28%]"
+              sizes="100vw"
+            />
+          </motion.div>
           <div className="absolute inset-0 bg-gradient-to-t from-rus-black/50 via-transparent to-rus-black/20" />
+
+          {/* Technical overlay: measurement line, ticks, node marks */}
+          <svg
+            className="pointer-events-none absolute inset-0 h-full w-full"
+            viewBox="0 0 100 125"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            {/* Terminal point where the diagonal edge lands */}
+            <motion.rect
+              x="1.5"
+              y="4.6"
+              width="2"
+              height="2"
+              fill="#FFC400"
+              initial={reduced ? { opacity: 1 } : { opacity: 0 }}
+              animate={reduced ? { opacity: 1 } : { opacity: [0, 1, 0.4, 1] }}
+              transition={reduced ? { duration: 0 } : { duration: 0.35, delay: 1.5, times: [0, 0.3, 0.6, 1] }}
+            />
+            {/* Low-opacity measurement line across the lower third */}
+            <motion.line
+              x1="4"
+              y1="100"
+              x2="96"
+              y2="100"
+              stroke="rgba(244,242,236,0.28)"
+              strokeWidth="0.3"
+              strokeDasharray="1.5 1.5"
+              vectorEffect="non-scaling-stroke"
+              initial={reduced ? { pathLength: 1 } : { pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={reduced ? { duration: 0 } : { duration: 0.6, delay: 1.45, ease: "linear" }}
+            />
+            <line x1="4" y1="98" x2="4" y2="102" stroke="rgba(244,242,236,0.35)" strokeWidth="0.4" vectorEffect="non-scaling-stroke" />
+            <line x1="96" y1="98" x2="96" y2="102" stroke="rgba(244,242,236,0.35)" strokeWidth="0.4" vectorEffect="non-scaling-stroke" />
+            {/* Node crosses — subconscious circuit detail */}
+            <g stroke="rgba(244,242,236,0.22)" strokeWidth="0.4" vectorEffect="non-scaling-stroke">
+              <line x1="88" y1="16" x2="92" y2="16" /><line x1="90" y1="14" x2="90" y2="18" />
+              <line x1="8" y1="84" x2="12" y2="84" /><line x1="10" y1="82" x2="10" y2="86" />
+            </g>
+          </svg>
+
           <p className="absolute bottom-3 left-3 flex items-center gap-2 bg-rus-black/90 px-3 py-2 font-mono text-[9px] uppercase tracking-[0.28em] text-rus-white/85">
             <span className="h-1 w-1 bg-rus-yellow" aria-hidden="true" />
             RUS technician · on site
           </p>
+          <span className="absolute bottom-3 right-4 font-mono text-[9px] uppercase tracking-[0.28em] text-rus-white/55" aria-hidden="true">
+            REF H01
+          </span>
         </motion.div>
       </div>
 
@@ -294,7 +363,7 @@ export default function Hero() {
           className="container-rus flex items-center gap-8 overflow-x-auto py-5 no-scrollbar"
           initial={reduced ? { opacity: 1 } : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={t(1.1, 0.4)}
+          transition={t(1.25, 0.4)}
         >
           {capabilities.map((capability, index) => (
             <span key={capability} className="flex shrink-0 items-center gap-8">

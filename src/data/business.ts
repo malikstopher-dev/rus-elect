@@ -1,7 +1,7 @@
 export const business = {
   businessName: "RUS Electrical",
   tagline: "done in a proper way",
-  refinedTagline: "Electrical work. Done the proper way.",
+  refinedTagline: "Electrical work. Done the proper way",
   primaryPhone: "072 132 6098",
   primaryPhoneLink: "tel:+27721326098",
   secondaryPhone: "073 605 5585",

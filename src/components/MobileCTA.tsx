@@ -19,16 +19,26 @@ export default function MobileCTA() {
   useEffect(() => {
     const footer = document.querySelector("footer");
     const quote = document.getElementById("quote");
-    const targets = [footer, quote].filter(
+    const contact = document.getElementById("contact-cta");
+    const targets = [footer, quote, contact].filter(
       (el): el is HTMLElement => el !== null
     );
     if (targets.length === 0) return;
 
+    // Track each target separately — the callback only reports targets whose
+    // intersection CHANGED, so a single boolean would flicker between them.
+    const visible = new Set<Element>();
     const observer = new IntersectionObserver(
       (entries) => {
-        setHidden(entries.some((e) => e.isIntersecting));
+        entries.forEach((e) => {
+          if (e.isIntersecting) visible.add(e.target);
+          else visible.delete(e.target);
+        });
+        setHidden(visible.size > 0);
       },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0 }
+      // Hide early: the bar retreats as the conversion section approaches,
+      // before it can cover anything.
+      { rootMargin: "0px 0px 15% 0px", threshold: 0 }
     );
     targets.forEach((t) => observer.observe(t));
     return () => observer.disconnect();

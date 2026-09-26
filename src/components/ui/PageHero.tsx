@@ -31,14 +31,15 @@ export default function PageHero({
 }) {
   const reduced = useReducedMotion();
 
-  const fadeUp = (delay: number) =>
-    reduced
-      ? {}
-      : {
-          initial: { opacity: 0, y: 28 },
-          animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.7, delay, ease: easings.smooth },
-        };
+  const fadeUp = (delay: number) => ({
+    initial: { opacity: reduced ? 1 : 0, y: reduced ? 0 : 28 },
+    animate: { opacity: 1, y: 0 },
+    transition: {
+      duration: reduced ? 0 : 0.7,
+      delay: reduced ? 0 : delay,
+      ease: easings.smooth,
+    },
+  });
 
   return (
     <section className="relative overflow-hidden border-b border-rus-white/10 bg-rus-black">

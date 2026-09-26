@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { motion, useInView, useScroll, useTransform, useSpring } from "framer-motion";
 import { useReducedMotion, easings } from "@/lib/motion";
 import { TraceRule } from "@/components/ui/Trace";
+import { SectionTrace } from "@/components/ui/Conductor";
 
 const steps = [
   {
@@ -106,6 +107,88 @@ function RelayNode({
   );
 }
 
+/**
+ * Mobile process node — activates as the travelling current reaches it.
+ * Border + number energise, text lifts to full opacity, and the node emits
+ * a single contact pulse on arrival. Fully scroll-reversible, never loops.
+ */
+function MobileStep({
+  step,
+  index,
+  total,
+  progress,
+  reduced,
+}: {
+  step: (typeof steps)[number];
+  index: number;
+  total: number;
+  progress: ReturnType<typeof useScroll>["scrollYProgress"];
+  reduced: boolean;
+}) {
+  const threshold = index / (total - 1);
+
+  const borderColor = useTransform(
+    progress,
+    [threshold - 0.07, threshold],
+    reduced
+      ? ["rgba(255,196,0,1)", "rgba(255,196,0,1)"]
+      : ["rgba(255,196,0,0.4)", "rgba(255,196,0,1)"]
+  );
+  const numberColor = useTransform(
+    progress,
+    [threshold - 0.07, threshold],
+    reduced
+      ? ["#FFC400", "#FFC400"]
+      : ["rgba(169,175,183,0.6)", "#FFC400"]
+  );
+  const textOpacity = useTransform(
+    progress,
+    [threshold - 0.09, threshold + 0.015],
+    reduced ? [1, 1] : [0.5, 1]
+  );
+  // Contact pulse flashes as the current lands on the node
+  const pulseOpacity = useTransform(
+    progress,
+    [threshold - 0.025, threshold, threshold + 0.05],
+    [0, 0.9, 0]
+  );
+  const nodeScale = useTransform(
+    progress,
+    [threshold - 0.02, threshold, threshold + 0.05],
+    reduced ? [1, 1, 1] : [1, 1.1, 1]
+  );
+
+  return (
+    <li className="relative flex gap-5 pb-9 last:pb-0">
+      <motion.span
+        className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center border bg-rus-black"
+        style={{ borderColor, scale: nodeScale }}
+        aria-hidden="true"
+      >
+        <motion.span
+          className="absolute inset-0"
+          style={{
+            boxShadow: "0 0 14px rgba(255,196,0,0.55)",
+            opacity: pulseOpacity,
+          }}
+          aria-hidden="true"
+        />
+        <motion.span className="relative font-mono text-xs font-bold" style={{ color: numberColor }}>
+          {step.number}
+        </motion.span>
+      </motion.span>
+      <motion.div className="min-w-0 pt-0.5" style={{ opacity: textOpacity }}>
+        <h3 className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-rus-white">
+          {step.title}
+        </h3>
+        <p className="mt-1.5 text-sm leading-relaxed text-rus-grey">
+          {step.description}
+        </p>
+      </motion.div>
+    </li>
+  );
+}
+
 export default function Process() {
   const reduced = useReducedMotion();
 
@@ -125,6 +208,14 @@ export default function Process() {
       ref={sectionRef}
       className="relative bg-rus-graphite section-pad overflow-hidden"
     >
+      <SectionTrace />
+      {/* Schematic corner frame — sparse technical mark */}
+      <div className="pointer-events-none absolute inset-4 lg:inset-6" aria-hidden="true">
+        <span className="absolute left-0 top-0 h-4 w-4 border-l border-t border-rus-white/[0.07]" />
+        <span className="absolute right-0 top-0 h-4 w-4 border-r border-t border-rus-white/[0.07]" />
+        <span className="absolute bottom-0 left-0 h-4 w-4 border-b border-l border-rus-white/[0.07]" />
+        <span className="absolute bottom-0 right-0 h-4 w-4 border-b border-r border-rus-white/[0.07]" />
+      </div>
       <div className="container-rus">
         <motion.div
           className="mb-12 lg:mb-14"
@@ -198,7 +289,7 @@ export default function Process() {
           })}
         </ol>
 
-        {/* ── Mobile: vertical distribution line, energises downward ── */}
+        {/* ── Mobile: vertical distribution line, current flows on scroll ── */}
         <ol ref={mobileRef} className="relative lg:hidden">
           <div className="absolute bottom-8 left-[15px] top-8 w-px bg-rus-white/10" aria-hidden="true" />
           <motion.div
@@ -212,23 +303,15 @@ export default function Process() {
             aria-hidden="true"
           />
 
-          {steps.map((step) => (
-            <li key={step.number} className="relative flex gap-5 pb-9 last:pb-0">
-              <span
-                className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center border border-rus-yellow/40 bg-rus-black font-mono text-xs font-bold text-rus-yellow"
-                aria-hidden="true"
-              >
-                {step.number}
-              </span>
-              <div className="min-w-0 pt-0.5">
-                <h3 className="font-mono text-sm font-bold uppercase tracking-[0.2em] text-rus-white">
-                  {step.title}
-                </h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-rus-grey">
-                  {step.description}
-                </p>
-              </div>
-            </li>
+          {steps.map((step, index) => (
+            <MobileStep
+              key={step.number}
+              step={step}
+              index={index}
+              total={steps.length}
+              progress={lineY}
+              reduced={reduced}
+            />
           ))}
         </ol>
       </div>

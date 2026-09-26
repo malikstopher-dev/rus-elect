@@ -120,7 +120,7 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between">
           <Link
             href="/"
-            className="group flex-shrink-0"
+            className="group flex-shrink-0 py-1.5"
             aria-label="RUS Electrical — home"
           >
             <span className="flex items-center gap-3">
@@ -217,12 +217,36 @@ export default function Navbar() {
           <button
             ref={menuButtonRef}
             onClick={() => (isOpen ? closeMenu() : setIsOpen(true))}
-            className="p-2 text-rus-white transition-colors hover:text-rus-yellow xl:hidden"
+            className="p-2.5 text-rus-white transition-colors hover:text-rus-yellow xl:hidden"
             aria-label={isOpen ? "Close menu" : "Open menu"}
             aria-expanded={isOpen}
             aria-controls="mobile-nav-panel"
           >
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            <AnimatePresence mode="wait" initial={false}>
+              {isOpen ? (
+                <motion.span
+                  key="close-icon"
+                  className="block"
+                  initial={reduced ? { opacity: 1 } : { rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={reduced ? { opacity: 0 } : { rotate: 90, opacity: 0 }}
+                  transition={{ duration: reduced ? 0 : 0.16, ease: easings.snappy }}
+                >
+                  <X className="h-6 w-6" />
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="open-icon"
+                  className="block"
+                  initial={reduced ? { opacity: 1 } : { rotate: 90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={reduced ? { opacity: 0 } : { rotate: -90, opacity: 0 }}
+                  transition={{ duration: reduced ? 0 : 0.16, ease: easings.snappy }}
+                >
+                  <Menu className="h-6 w-6" />
+                </motion.span>
+              )}
+            </AnimatePresence>
           </button>
         </div>
       </nav>

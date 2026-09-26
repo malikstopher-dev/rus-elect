@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useReducedMotion, easings } from "@/lib/motion";
 import { TraceRule } from "@/components/ui/Trace";
 import { business } from "@/data/business";
@@ -27,6 +28,8 @@ const principles = [
  */
 export default function CustomerExperience() {
   const reduced = useReducedMotion();
+  // Mobile proof lines: first proof open by default, tap to latch/unlatch
+  const [openIdx, setOpenIdx] = useState(0);
 
   const enter = (delay: number) => ({
     initial: reduced ? { opacity: 1 } : { opacity: 0, y: 28 },
@@ -65,22 +68,69 @@ export default function CustomerExperience() {
           {/* ── Proof points — compact rows, second on mobile ────── */}
           <div className="order-2 mt-9 lg:col-span-7 lg:row-start-3 lg:mt-0">
             <motion.div {...enter(0.3)}>
-              {principles.map((item, index) => (
-                <div
-                  key={item.title}
-                  className="flex flex-col gap-1 border-t border-rus-white/10 py-4 last:border-b sm:flex-row sm:items-baseline sm:gap-5"
-                >
-                  <span className="font-mono text-xs text-rus-yellow">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className="font-semibold text-rus-white sm:w-44 sm:shrink-0">
-                    {item.title}
-                  </span>
-                  <span className="text-sm leading-relaxed text-rus-grey">
-                    {item.description}
-                  </span>
-                </div>
-              ))}
+              {principles.map((item, index) => {
+                const isOpen = openIdx === index;
+                return (
+                  <div
+                    key={item.title}
+                    className="border-t border-rus-white/10 last:border-b"
+                  >
+                    {/* Mobile: tap the proof line to latch it open */}
+                    <button
+                      type="button"
+                      onClick={() => setOpenIdx(isOpen ? -1 : index)}
+                      aria-expanded={isOpen}
+                      className="flex w-full items-center gap-3 py-4 text-left sm:hidden"
+                    >
+                      <span className="font-mono text-xs text-rus-yellow">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <span className="flex-1 font-semibold text-rus-white">
+                        {item.title}
+                      </span>
+                      <span
+                        className={`flex h-6 w-6 items-center justify-center font-mono text-sm transition-colors duration-200 ${
+                          isOpen ? "text-rus-yellow" : "text-rus-grey/50"
+                        }`}
+                        aria-hidden="true"
+                      >
+                        {isOpen ? "−" : "+"}
+                      </span>
+                    </button>
+                    <AnimatePresence initial={false}>
+                      {isOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{
+                            duration: reduced ? 0 : 0.22,
+                            ease: easings.snappy,
+                          }}
+                          className="overflow-hidden sm:hidden"
+                        >
+                          <p className="pb-4 pl-7 pr-8 text-sm leading-relaxed text-rus-grey">
+                            {item.description}
+                          </p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    {/* Static row: tablet and desktop keep the approved layout */}
+                    <div className="hidden gap-1 py-4 sm:flex sm:flex-row sm:items-baseline sm:gap-5">
+                      <span className="font-mono text-xs text-rus-yellow">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <span className="font-semibold text-rus-white sm:w-44 sm:shrink-0">
+                        {item.title}
+                      </span>
+                      <span className="text-sm leading-relaxed text-rus-grey">
+                        {item.description}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
             </motion.div>
 
             {/* Verified trust line */}

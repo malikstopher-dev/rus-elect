@@ -70,7 +70,9 @@ export default function AboutPage() {
             </div>
 
             <div className="mt-8 divide-y divide-rus-white/5 border-y border-rus-white/10">
-              {Object.entries(business.verifiedFacts).map(
+              {Object.entries(business.verifiedFacts)
+                .filter(([key]) => key !== "tagline")
+                .map(
                 ([key, verified]) =>
                   verified && (
                     <div key={key} className="flex items-center gap-3 py-3">

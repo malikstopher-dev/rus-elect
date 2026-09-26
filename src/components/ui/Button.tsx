@@ -39,7 +39,7 @@ export function Button({
   const reduced = useReducedMotion();
 
   const sizeStyles = {
-    sm: "px-5 py-2.5 text-xs",
+    sm: "px-5 py-2.5 text-xs min-h-[44px] xl:min-h-0",
     md: "px-7 py-3.5 text-sm",
     lg: "px-10 py-4.5 text-base",
   };
